@@ -221,12 +221,16 @@ def make_list_of_values(allowed):
 
     return list_of_values
 
-def output(args):
+def output(fmt_string, *args):
     """trivial wraper for printing stuff on the screen"""
-    print(args)
+    print(fmt_string % args)
+
+#==============================================================================
 
 # Command line implementations.
-# We assume 'requests' module is preinstalled (generally true). if not, 'pip install requests' is a prerequisite
+
+# We assume 'requests' module is preinstalled (generally true).
+# If not, 'pip install requests' is a prerequisite. As an alternative, we can use python3 with urllib.request.
 
 import requests
 import json
@@ -244,12 +248,13 @@ def init():
 
 def cluster_create(args):
     """Creates a new cluster - creates VMs with needed components and configures the cluster"""
-    output("creating cluster named", args.name, "with config file", args.config)
+    output("creating cluster named '%s' with config '%s'", args.name, args.config)
     pass
 
 def cluster_ls(args):
     """Lists clusters managed by VCS"""
-    # Grab some random data , just for example. TBD: use the correct API
+    # This is just an example of gettin JSON data from REST API
+    # Should be replaced with actual VCS calls to VCS_HOST
     output("List all clusters managed by VCS at %s.\nFor now, just get some stuff from REST API", VCS_HOST)
     resp = requests.get('https://jsonplaceholder.typicode.com/posts/1')
     if resp.status_code != 200:
