@@ -1,0 +1,88 @@
+#
+# YAML for VSC API swagger definition 
+#
+swagger: '2.0'
+
+info:
+  version: '0.0.1'
+  title: VSphere Cluster Services (VCS) API
+  description: Provision and manage Kubernetes and other clusters running on VMWare VSphere
+  
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+
+basePath: /vcs
+
+definitions:              
+  ClusterInfo:
+    type: object
+    properties:
+      clusterType:
+        description: KUBERNETES or other cluster types (to be supported).
+        type: string
+      imageId:
+          type: string
+          description: 'Name of VMDK image for cluster nodes, e.g. `Kubernetes-image.vmdk`'
+      projectId:
+        type: string
+        description: Photon Controller Project ID
+      vmNetworkId:
+        type: string
+        description: Photon Controller Network ID
+      diskFlavorName:
+          type: string
+          description: Photon Controller disk flavor to use
+      masterVmFlavorName:
+          type: string
+          description: Photon Controller VM flavor to use for Kube master
+      otherVMFlavorName:
+          type: string
+          description: Photon Controller VM flavor to use for nodes
+
+
+paths:
+  /cloudstore/clusters:
+    get:
+      description: |
+        Gets `cluster` objects.
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            title: ArrayOfClusters
+            type: array
+            items:
+              title: Cluster
+              type: object
+              properties:
+                name:
+                  type: string
+                single:
+                  type: boolean
+  /clustermanager/vcs-cluster-create:
+    post:
+      description: creates a cluster
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: 'A name to identify a cluster, e.g. `MyFirstCluster`'
+          required: true
+          schema: 
+            $ref: '#/definitions/ClusterInfo'
+        
+      responses:
+        '200':
+          description: Creation started successfully
+        default:
+          description: Something did not work
+
+
