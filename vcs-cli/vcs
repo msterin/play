@@ -267,7 +267,7 @@ def cluster_ls(args):
     if resp.status_code != 200:
         # This means something went wrong.
         raise Exception(resp.status_code)
-    output("reply from the GET request:", resp)
+    output("reply from the GET request: %s", resp)
     # json.dumps(resp.json())
 
 def cluster_rm(args):
