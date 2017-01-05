@@ -49,21 +49,12 @@ paths:
   /cloudstore/clusters:
     get:
       description: |
-        Gets `cluster` objects.
+        Gets `cluster` objects. Cluster object represent VCS knpwledge about Kubernetes and other clusters VCS manages. See 
       responses:
         '200':
           description: Successful response
           schema:
-            title: ArrayOfClusters
-            type: array
-            items:
-              title: Cluster
-              type: object
-              properties:
-                name:
-                  type: string
-                single:
-                  type: boolean
+              $ref: '#/definitions/ClusterInfo'
   /clustermanager/vcs-cluster-create:
     post:
       description: creates a cluster
