@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 2016 VMware, Inc. All Rights Reserved.
+# Copyright 2016 VMWare, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Admin CLI for VCS. Derived from vmdkops_admin.py
-# 
-# How to change: 
+'''
+VCS is  command line interface for VSphere Container Service
+
+Derived from vmdkops_admin.py
+
+'''
+
+# Notes to developer -  how to change code:
 # 1. modify commands() table to parse desired syntax (function help tells  you how)
 # 2. implement or update functions mentioned in the commands() table to carry the actions
-# 
-# Note that the current code already represents VCS cluster  command line control, but implenentation is stubbed
+#
+# Note that the current code already represents
+# VCS cluster command line control, but implementation is stubbed
 #
 
 import os
@@ -199,7 +205,6 @@ def parse_args():
 def comma_seperated_string(string):
     return string.split(',')
 
-
 def make_list_of_values(allowed):
     """
     Take a list of allowed values for an option and return a function that can be
@@ -222,7 +227,7 @@ def make_list_of_values(allowed):
     return list_of_values
 
 def output(fmt_string, *args):
-    """trivial wraper for printing stuff on the screen"""
+    """Trivial wraper for printing stuff on the screen"""
     print(fmt_string % args)
 
 #==============================================================================
@@ -255,12 +260,15 @@ def cluster_ls(args):
     """Lists clusters managed by VCS"""
     # This is just an example of gettin JSON data from REST API
     # Should be replaced with actual VCS calls to VCS_HOST
-    output("List all clusters managed by VCS at %s.\nFor now, just get some stuff from REST API", VCS_HOST)
-    resp = requests.get('https://jsonplaceholder.typicode.com/posts/1')
+    output("List all clusters managed by VCS at %s.", VCS_HOST)
+    cmd = VCS_HOST + "/vcs/cloudstore/clusters"
+    output(cmd) # debug
+    resp = requests.get(cmd)
     if resp.status_code != 200:
         # This means something went wrong.
         raise Exception(resp.status_code)
-    output("reply from the GET request:", json.dumps(resp.json()))
+    output("reply from the GET request:", resp)
+    # json.dumps(resp.json())
 
 def cluster_rm(args):
     """Removes a cluster managed by VCS. That includes VM deletion"""
