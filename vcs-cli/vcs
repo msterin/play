@@ -28,9 +28,18 @@ Derived from vmdkops_admin.py
 # VCS cluster command line control, but implementation is stubbed
 #
 
+# Note: We assume 'requests' module is preinstalled (generally true).
+# If not, 'pip install requests' is a prerequisite. 
+# As an alternative, we can use python3 with urllib.request.
+import requests
+import six
 import os
+import os.path
 import sys
 import argparse
+import json
+
+
 
 def commands():
     """
@@ -112,30 +121,52 @@ def commands():
                     'help': 'Create a new cluster',
                     'args': {
                         '--name': {
-                            'help': 'The name of the cluster',
+                            'help': 'Name of the cluster',
                             'required': True
                         },
                         '--type': {
-                            'help': 'The type of the cluster',
-                            'choices': ['kubernetes', 'mesos', 'swarm'],
+                            # this one is not requires as we will use KUBERNETES by default
+                            'help': 'Type of the cluster',
+                            'choices': ['KUBERNETES', 'MESOS', 'SWARM']
+                        },
+                        '--slaves': {
+                            'help': "How many slave (minion) nodes to create. Default 1",
+                            'metavar': 'COUNT',
+                            'default': 1,
+                            'type': int
+
+                        },
+                        '--etcd_ips': {
+                            'help': 'Static IP to use for `etcd` nodes. '
+                                    'For multiple nodes, use comma-separated list',
+                            'metavar': 'NETWORK',
                             'required': True
                         },
-                        '--config': {
-                            'help': 'A YAML file with cluster configuration',
+                        '--master_ip': {
+                            'help': 'Static IP to use for `kube master.',
+                            'metavar': 'NETWORK',
+                            'required': True
+                        },
+                        '--container_network': {
+                            'help': 'Inter-container network mask, e.g. 10.20.0.1/20',
+                            'metavar': 'NETWORK/MASK',
                             'required': True
                         }
                     }
                 },
-                'update': {
-                    'func': cluster_update,
-                    'help': 'Update an existing cluster',
+                'scale': {
+                    'func': cluster_scale,
+                    'help': 'Scale an existing cluster',
                     'args': {
                         '--name': {
                             'help': 'The name of the cluster',
                             'required': True
                         },
-                        '--config': {
-                            'help': 'YAML file with new configuration',
+                        '--slaves': {
+                            'help': "How many slave (minion) nodes to scale to.",
+                            'metavar': 'COUNT',
+                            'default': 1,
+                            'type': int
                         }
                     }
                 },
@@ -152,13 +183,14 @@ def commands():
                 'ls': {
                     'func': cluster_ls,
                     'help': 'List clusters managed by VCS'
+                },
+                'status': {
+                    'func': vcs_status,
+                    'help': 'Show the status of the VCS service'
                 }
             }
         },
-        'status': {
-            'func': vcs_status,
-            'help': 'Show the status of the VCS service'
-        }
+
     }
 
 
@@ -228,59 +260,66 @@ def make_list_of_values(allowed):
 
 def output(fmt_string, *args):
     """Trivial wraper for printing stuff on the screen"""
-    print(fmt_string % args)
+    if args:
+        six.print_(fmt_string % args)
+    else:
+        six.print_(fmt_string)
 
 #==============================================================================
 
 # Command line implementations.
 
-# We assume 'requests' module is preinstalled (generally true).
-# If not, 'pip install requests' is a prerequisite. As an alternative, we can use python3 with urllib.request.
-
-import requests
-import json
+# First line to be printed by the command on each invocation  
+INFO = "vSphere Container Service admin command line v0.1\n"
 
 def init():
-    print("vSphere Container Service admin command line v0.1")
+    six.print_(INFO)
     # Make sure VCS_HOST is set, and exit if it's not
     try:
         global VCS_HOST
         VCS_HOST = os.environ['VCS_HOST']
     except:
-        print("Missing VCS_HOST, please set it.  Example: 'export VCS_HOST=10.20.1.11:2121'")
+        six.print_("Missing VCS_HOST, please set it before running 'vcs' tool. "
+                   "Example: 'VCS_HOST=10.20.1.11:2121 vcs cluster ls'")
         sys.exit(1)
 
 
 def cluster_create(args):
     """Creates a new cluster - creates VMs with needed components and configures the cluster"""
-    output("creating cluster named '%s' with config '%s'", args.name, args.config)
-    pass
+    output("Creating cluster named '%s' (NOT IMPLEMENTED YET)", args.name)
+    output(args)
+
 
 def cluster_ls(args):
     """Lists clusters managed by VCS"""
     # This is just an example of gettin JSON data from REST API
     # Should be replaced with actual VCS calls to VCS_HOST
-    output("List all clusters managed by VCS at %s.", VCS_HOST)
+    output("List all clusters managed by VCS at %s:", VCS_HOST)
     cmd = VCS_HOST + "/vcs/cloudstore/clusters"
-    output(cmd) # debug
     resp = requests.get(cmd)
     if resp.status_code != 200:
-        # This means something went wrong.
+        # This means something went wrong. TBD: useful err. msg
         raise Exception(resp.status_code)
-    output("reply from the GET request: %s", resp)
-    # json.dumps(resp.json())
+    known_clusters = json.loads(resp.content)['documentLinks']
+    for cluster in known_clusters:
+        resp = requests.get(VCS_HOST + cluster)
+        cluster_info = json.loads(resp.content)
+        output("=====\nCluster %s", os.path.basename(cluster_info['documentSelfLink']))
+        for k in ('clusterState', 'clusterhealth', 'clusterName', 'slaveCount', 'extendedProperties'):
+            output("%s = %s", k, cluster_info[k])
 
 def cluster_rm(args):
     """Removes a cluster managed by VCS. That includes VM deletion"""
     pass
 
-def cluster_update(args):
+def cluster_scale(args):
     """Re-configures a cluster based on the new config passed in args"""
-    pass
+    output("Scaling cluster '%s' to %d slaves. (NOT IMPLEMENTED YET)", args.name, args.slaves)
 
 def vcs_status(args):
     """Reports overall status of VCS service"""
     output("VSC Service is up and healthy, hopefully, on %s", VCS_HOST)
+    #TBD get the list
 
 
 if __name__ == '__main__':
