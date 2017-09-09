@@ -39,10 +39,6 @@ def extract_samples(fio_file, samples_file):
         for value in occuring_values:
             for sample in range(bins[str(value)]):
                 f.writelines([str(value), "\n"])
-    # for value in map(lambda x: [str(x)] * bins[str(x)], occuring_values):
-    #     for sample in value:
-    #         print(sample)
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
