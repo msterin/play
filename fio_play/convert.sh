@@ -23,10 +23,10 @@ samples=`tempfile`
 $dump $fio_file $samples
 
 fio_base="${fio_file%.*}" # strip suffix
-stats_file=$fio_base.stats
 dist_file=$fio_base.dist_table
 
-echo generating dist and stats \($dist_file and $stats_file\)
-$stats $samples > $stats_file
-$maketable $samples > $dist_file
+echo generating dist and stats in $dist_file...
+echo "# Stats and distribution. Src=$fio_file"  > $dist_file
+$stats $samples >> $dist_file
+$maketable $samples >> $dist_file
 rm $samples

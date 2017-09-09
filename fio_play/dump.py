@@ -5,15 +5,12 @@
 # note: we assume only one job in FIO output. Otherwise, we'd need to select
 # one we want to generate distribution for
 
+#
+# TBD - extract separare -read and -write files, and use them too.
+#
+
 import json
 import sys
-
-# params (can be moved to options later)
-#FIO_FILENAME = 'fio_file'   # FIO output file, in --output=json+ format
-
-
-# distribution_table_file = FIO_FILENAME + ".dist"
-# stats_file = FIO_FILENAME + ".stats"
 
 def extract_samples(fio_file, samples_file):
     """
@@ -42,6 +39,8 @@ def extract_samples(fio_file, samples_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print('Convert FIO json+ output to a flat colums of samples. Usage:\ndump.py <fio_output> <samples_file>')
+        print("Convert FIO json+ output to a flat colums of samples.")
+        print("Usage: dump.py <fio_output> <samples_file>'")
+        sys.exit(2)
     extract_samples(sys.argv[1], sys.argv[2])
 

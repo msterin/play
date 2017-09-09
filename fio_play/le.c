@@ -59,8 +59,10 @@
  /*
  * Simplistic file parser for distrbution data.
  * Format is:
- *	# comment line(s)
- *	data0 data1 ...
+ *	  # comment line(s)
+ *	  data0 data1 ...
+ * data starts with a numeric.
+ * Lines not starting with numberic are silently skipped
  */
  static int
  get_distribution(const char *name, int16_t *data, int maxdata)
@@ -79,7 +81,7 @@
      n = 0;
      while (getline(&line, &len, f) != -1) {
          char *p, *endp;
-         if (*line == '\n' || *line == '#')
+         if (*line == '\n' || *line == '#' || isalpha(*line))
              continue;
 
          for (p = line; ; p = endp) {
@@ -104,11 +106,13 @@
 
 /*
  * Simplistic parser for stats file.
- * File format example:
- mu =      328.351351
- sigma =    38.548838
- rho =       1.000029
- * returns -1 if fails
+ * File format:
+ *    # comments...
+ *    mu =      328.351351
+ *    sigma =    38.548838
+ *    rho =       1.000029
+ * When 'rho' found, exists since rho is always the last.
+ * returns 0 on success ,-1 if fails
  */
 static int
 get_stats(const char* name, uint32_t* mu, uint32_t* sigma,  uint32_t* rho)
@@ -148,12 +152,14 @@ get_stats(const char* name, uint32_t* mu, uint32_t* sigma,  uint32_t* rho)
             *sigma = (uint32_t)val;
         } else if (strcmp(key, "rho") == 0) {
             *rho = (uint32_t)val;
+            break;
         } else {
             fprintf(stderr, "Unknown key `%s`, skipping\n", key);
             return -1;
         }
     }
     fprintf(stderr, "Using mu, sigma, rho: %u %u %u\n", *mu, *sigma, *rho);
+    fclose(f);
     return 0;
 }
 
@@ -205,13 +211,23 @@ generate_latencies(int16_t* dist_data, size_t dist_size,  uint32_t mu, uint32_t 
 
 int
 main(int argc, char* argv[]) {
-    if (argc != 4) {
-        printf("Usage: le <dist_table> <stats> <number_of_samples>\n");
+    if (argc != 3) {
+        printf("Usage: le <dist_table_file> <number_of_samples>\n");
         exit(2);
     }
     char *dist_file = argv[1];
-    char *stats_file = argv[2];
-    int count = atoi(argv[3]);
+    int count = atoi(argv[2]);
+
+
+    /* read the stats (mean (mu), standard deviation (sigma), and correlation coefficient (rho))
+     * to adjust the generated values */
+     /* note: we do not use rho yet */
+    uint32_t mu, sigma, rho;
+
+    if (get_stats(dist_file, &mu, &sigma, &rho) != 0) {
+        fprintf(stderr, "Failed to parse stats from %s", dist_file);
+        exit(3);
+    }
 
     // read the distr
     int16_t  *dist_data = NULL;
@@ -219,17 +235,7 @@ main(int argc, char* argv[]) {
     dist_data = calloc(sizeof(dist_data[0]), MAX_DIST);
     dist_size = get_distribution(dist_file, dist_data, MAX_DIST);
     if (dist_size <=0 ) {
-        fprintf(stderr, "Failed to parse distribution file %s\n", dist_file);
-        exit(3);
-    }
-
-    /* stats (mean (mu), standard deviation (sigma), and correlation coefficient (rho))
-     * to adjust the generated values */
-     /* note: we do not use rho yet */
-    uint32_t mu, sigma, rho;
-
-    if (get_stats(stats_file, &mu, &sigma, &rho) != 0) {
-        fprintf(stderr, "Failed to parse stats file %s", stats_file);
+        fprintf(stderr, "Failed to parse distribution table from %s\n", dist_file);
         exit(3);
     }
 
