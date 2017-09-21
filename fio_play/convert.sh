@@ -19,7 +19,7 @@ fi
 
 
 echo generating samples from $fio_file...
-samples=`tempfile`
+samples=`mktemp`
 $dump $fio_file $samples
 
 fio_base="${fio_file%.*}" # strip suffix
