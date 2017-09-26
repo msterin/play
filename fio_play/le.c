@@ -240,4 +240,5 @@ main(int argc, char* argv[]) {
     }
 
     generate_latencies(dist_data, dist_size, mu, sigma, rho, count);
+    return 0;
 }
