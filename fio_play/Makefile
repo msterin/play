@@ -9,7 +9,7 @@ DISTR := example/fio-random-loop_0-oio_8-rw_70-bs_4096.dist_table
 TMPFILE := $(shell mktemp)
 
 
-all: le maketable check clean
+all: le maketable check
 	@echo Done
 
 le: le.c
@@ -24,7 +24,7 @@ stats: stats.c
 check: le
 	./le $(DISTR) $(COUNT) > $(TMPFILE)
 	@echo TBF checking the distribution
-
+	@echo do not forget to rm  $(TMPFILE)
 
 clean:
-	echo rm -f le $(TMPFILE)
+	rm -f le stats maketable $(TMPFILE)
