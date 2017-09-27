@@ -9,11 +9,17 @@ DISTR := example/fio-random-loop_0-oio_8-rw_70-bs_4096.dist_table
 TMPFILE := $(shell mktemp)
 
 
-all: le check clean
+all: le maketable check clean
 	@echo Done
 
 le: le.c
 	$(CC) -o le -g le.c
+
+maketable: maketable.c
+	$(CC) -o $@ $? -lm
+
+stats: stats.c
+	$(CC) -o $@ $? -lm
 
 check: le
 	./le $(DISTR) $(COUNT) > $(TMPFILE)
