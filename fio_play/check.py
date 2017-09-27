@@ -5,16 +5,22 @@
 #
 
 import sys
+import numpy
+
 
 def check_samples(filename):
-   with open(filename) as f:
-      samples = map(lambda x: int(x) , f.readlines())
-      count = len(samples)
-   average = reduce(lambda x, y: x + y, samples)/count
-   print ("Average", average)
-   for i in range (10, 101, 5):
-      print ("P%d : %d", (i, samples[count/100 * i ]))
-
+    with open(filename) as f:
+        samples = map(lambda x: int(x) , f.readlines())
+        count = len(samples)
+        samples.sort()
+    for i in range(10, 100, 5) + range (95, 100, 1):
+        print ("P%d : %d" % (i, samples[count/100 * i]))
+    for i in range(991, 1000, 1):
+        print ("P99.%d : %d (%d)" % (i - 990, samples[count/1000 * i ], count/1000 * i))
+    print ("Mean %d" % round(numpy.mean(samples), 2))
+    print ("Median %d" % samples[count/2])
+    print ("Std %d" % round(numpy.std(samples), 2))
+    print ("Range: MIN..MAX %d..%d"% (samples[0], samples[-1]))
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

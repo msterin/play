@@ -30,3 +30,4 @@ echo "# Stats and distribution. Src=$fio_file"  > $dist_file
 $stats $samples >> $dist_file
 $maketable $samples >> $dist_file
 rm $samples
+#echo $samples
