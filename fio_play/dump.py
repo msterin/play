@@ -82,14 +82,15 @@ if __name__ == '__main__':
             prev_ddir = ddir
 
         stub, ext = os.path.splitext(args.dest)
-        outfile = stub + '_job' + str(jobnum) + ext
 
-        with open(outfile, 'w') as output:
-            for x in range(bin_const['read']['FIO_IO_U_PLAT_NR']):
-                 lat = plat_idx_to_val(x,
-                                       bin_const['read']['FIO_IO_U_PLAT_BITS'],
-                                       bin_const['read']['FIO_IO_U_PLAT_VAL'])
-                 for i in range(bins['write'][str(x)]):
+        for ddir  in ddir_list:
+            outfile = stub + '_job' + str(jobnum) + "_" + ddir + ext
+            with open(outfile, 'w') as output:
+                for x in range(bin_const[ddir]['FIO_IO_U_PLAT_NR']):
+                    lat = plat_idx_to_val(x,
+                                        bin_const[ddir]['FIO_IO_U_PLAT_BITS'],
+                                        bin_const[ddir]['FIO_IO_U_PLAT_VAL'])
+                    for i in range(bins[ddir][str(x)]):
                      output.write("{0}\n".format(lat))
 
 
