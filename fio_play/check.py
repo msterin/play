@@ -10,17 +10,21 @@ import numpy
 
 def check_samples(filename):
     with open(filename) as f:
-        samples = map(lambda x: int(x) , f.readlines())
+        samples = map(lambda x: int(float(x)) , f.readlines())
         count = len(samples)
         samples.sort()
+
+    print ("\"min\" : %d," % samples[0])
+    print ("\"max\" : %d," % samples[-1])
+    print ("\"mean\" : %d," % round(numpy.mean(samples), 2))
+    print ("\"median\" : %d," % samples[count/2])
+    print ("\"stddev\" : %d" % round(numpy.std(samples), 2))
+
+    print("percentile : {")
     for i in range(10, 100, 5) + range (95, 100, 1):
-        print ("P%d : %d" % (i, samples[count/100 * i]))
+        print ("  \"%d\" : %d," % (i, samples[count/100 * i]))
     for i in range(991, 1000, 1):
-        print ("P99.%d : %d (%d)" % (i - 990, samples[count/1000 * i ], count/1000 * i))
-    print ("Mean %d" % round(numpy.mean(samples), 2))
-    print ("Median %d" % samples[count/2])
-    print ("Std %d" % round(numpy.std(samples), 2))
-    print ("Range: MIN..MAX %d..%d"% (samples[0], samples[-1]))
+        print ("  \"99.%d\" : %d" % (i - 990, samples[count/1000 * i ]))
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

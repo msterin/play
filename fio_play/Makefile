@@ -9,7 +9,7 @@ DISTR := example/fio-random-loop_0-oio_8-rw_70-bs_4096.dist_table
 TMPFILE := $(shell mktemp)
 
 
-all: le maketable check
+all: le maketable stats check
 	@echo Done
 
 le: le.c
