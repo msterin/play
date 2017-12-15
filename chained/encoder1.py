@@ -66,7 +66,7 @@ def process_file(source_name, out_name, hash_name):
     current_hash = None
 
     # scan the source file while building hashes, but write hash in the proper location
-    while block_start >= 0:
+    while True:
         source_fd.seek(block_start)
         #print("setting position to {0}".format(block_start))
         block = source_fd.read(const.BLOCKSIZE)
@@ -75,11 +75,11 @@ def process_file(source_name, out_name, hash_name):
         out_fd.write(block)
         if current_hash is not None:
             block += current_hash.digest()
-        # calculate ans save the hash, and move to the prior block
+        # calculate and save the hash, and move to the prior block
         current_hash = hashlib.sha256(block)
         # write out hash
         if out_loc == 0:
-            # first block. juust save hash in a dedicated file and we are done
+            # first block. just save hash in a dedicated file and we are done
             hash_fd.write(current_hash.digest())
             break
         else:
@@ -87,9 +87,6 @@ def process_file(source_name, out_name, hash_name):
             out_fd.seek(out_loc - const.HASHSIZE)
             out_fd.write(current_hash.digest())
         block_start -= const.BLOCKSIZE
-
-
-
     # close - we are done
     source_fd.close()
     out_fd.close()
