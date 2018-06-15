@@ -3,7 +3,7 @@
 # An encoder that receives a file and creates the hash-protected version of the file, as well as the
 # hex string of h 0 (exactly 64 hex digits).
 #
-# this version does only one pass on source read
+# This version does only one pass on source file.
 # written by msterin@yahoo.com 12/14/2017
 
 import hashlib
