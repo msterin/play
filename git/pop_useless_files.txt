@@ -1,0 +1,9 @@
+skyscraper-base/agent/src/main/resources/deliverable/jre-8u131-linux-x64.rpm
+skyscraper-base/agent/src/main/resources/deliverable/jre-8u121-linux-x64.rpm
+skyscraper-base/agent/src/main/resources/deliverable/jre-8u92-linux-x64.rpm
+skyscraper-base/agent/src/main/resources/deliverable/jre-8u74-linux-x64.rpm
+skyscraper-base/OSSTP_plugin.tar
+prototype
+esx-as-service
+misc/sparse
+vcqe
