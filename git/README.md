@@ -77,3 +77,6 @@ push:
 ```
 
 ## Update the team
+
+Everyone needs to `git fetch -a -p` and `git rebase origin/master` on their branches,
+before any push.
